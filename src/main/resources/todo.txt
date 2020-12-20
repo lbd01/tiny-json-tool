@@ -1,0 +1,20 @@
++list of all fields
++handle null values
++handle escaped characters
++optim whitespace
++whitespace - not use chars for comparison but byte vals
++isDigit
++stringvalue->string
++to json
++maintain field order - Linked
++test cases for serializing to json
++test cases for parsing
++rename DataNode / Datanodevalue? ->JsonObject / JsonValue | JsonObj JsonVal
++test cases for creating
++handle [1,] {a:1,} error
+
+...optimize unicode - https://www.javacodegeeks.com/2010/11/java-best-practices-char-to-byte-and.html
+
+switch / if optimization
+to pretty json
+convenient methods for field set in jsonObj e.g. setFieldValue(String fieldName, String fieldVal)

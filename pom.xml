@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.lbd01</groupId>
   <artifactId>tiny-json-tool</artifactId>
-  <version>1-SNAPSHOT</version>
+  <version>1</version>
   <packaging>jar</packaging>
   <name>tiny-json-tool</name>
 

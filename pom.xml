@@ -19,6 +19,14 @@
 	<properties>
 		<java.version>9</java.version>
 	</properties>
+	
+	<distributionManagement>
+	   <repository>
+		 <id>github</id>
+		 <name>GitHub lbd01 Apache Maven Packages</name>
+		 <url>https://maven.pkg.github.com/lbd01/tiny-json-tool</url>
+	   </repository>
+	</distributionManagement>
 
     <build>
         <plugins>

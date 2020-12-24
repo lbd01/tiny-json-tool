@@ -6,8 +6,6 @@ import net.lbd01.tiny.json.JsonParseException;
 import net.lbd01.tiny.json.TinyJsonTool;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -17,28 +15,12 @@ import static org.junit.Assert.*;
 public class JsonParseTest {
 
     @Test
-    public void randomTest() throws Exception{
-        //b[bpos] = (byte) ((buffer[i]&0xFF00)>>8);
-        //b[bpos + 1] = (byte) (buffer[i]&0x00FF);
-        char unicodeChar = (char)Integer.parseInt(
-                "0105",
-                16);
-        byte b1 = (byte) ((unicodeChar&0xFF00)>>8);
-        byte b2 = (byte) (unicodeChar&0x00FF);
-        System.out.println("s: " + new String(new byte[]{b1,b2}));
-
-        //DataOutputStream dataOutputStream = new DataOutputStream(new ByteArrayOutputStream());
-        //dataOutputStream.writeChar(unicodeChar);
-        //System.out.println("s: " + dataOutputStream. toString());
-    }
-
-    @Test
     public void stringParseTest() {
         String[] values = new String[]{"","a","\u0105","1","\\\"","\\\\","\\/","\\b","\\f","\\n","\\r","\\t","\\u0105","\\\"\\\\\\/\\b\\f\\n\\r\\t\\u0105","Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."};
         for (String value : values) {
             String json = "{\"txt\":\""+value+"\"}";
             JsonObj node = TinyJsonTool.parseObject(json);
-            JsonVal val = node.getFieldValue("txt");
+            JsonVal val = node.get("txt");
             assertTrue("Not an string: " + value,val.isString());
             assertEquals("Parse error: " + value,processEscapes(value),val.getString());
         }
@@ -64,7 +46,7 @@ public class JsonParseTest {
         for (String value : values) {
             String json = "{\"num\":"+value+"}";
             JsonObj node = TinyJsonTool.parseObject(json);
-            JsonVal val = node.getFieldValue("num");
+            JsonVal val = node.get("num");
             assertTrue("Not an integer: " + value,val.isInteger());
             assertTrue("Parse error: " + value,Integer.valueOf(value).equals(val.getInteger()));
         }
@@ -72,7 +54,7 @@ public class JsonParseTest {
         for (String value : values) {
             String json = "{\"num\":"+value+"}";
             JsonObj node = TinyJsonTool.parseObject(json);
-            JsonVal val = node.getFieldValue("num");
+            JsonVal val = node.get("num");
             assertTrue("Not a decimal: " + value,val.isDecimal());
             assertTrue("Parse error: " + value,new BigDecimal(value).equals(val.getDecimal()));
         }
@@ -84,7 +66,7 @@ public class JsonParseTest {
         for (String value : values) {
             String json = "{\"bool\":"+value+"}";
             JsonObj node = TinyJsonTool.parseObject(json);
-            JsonVal val = node.getFieldValue("bool");
+            JsonVal val = node.get("bool");
             assertTrue("Not a boolean: " + value,val.isBool());
             assertTrue("Parse error: " + value,Boolean.valueOf(value).equals(val.getBool()));
         }
@@ -94,20 +76,20 @@ public class JsonParseTest {
     public void nullParseTest() {
         String json = "{\"a\":null}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("a");
-        assertTrue("Not a null: " + json,val.isNull());
+        JsonVal val = node.get("a");
+        assertNull("Not a null: " + json,val);
     }
 
     @Test
     public void mixedArrayParseTest() {
         String json = "{\"array\":[null,1,2.3,\"txt\",{\"b\":\"txt\"}]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",5,val.getArray().size());
 
-        assertTrue("Wrong item 1 value type",val.getArray().get(0).isNull());
+        assertNull("Wrong item 1 value",val.getArray().get(0));
         assertTrue("Wrong item 2 value type",val.getArray().get(1).isInteger());
         assertTrue("Wrong item 2 value", Integer.valueOf(1).equals(val.getArray().get(1).getInteger()));
         assertTrue("Wrong item 3 value type",val.getArray().get(2).isDecimal());
@@ -115,8 +97,8 @@ public class JsonParseTest {
         assertTrue("Wrong item 4 value type",val.getArray().get(3).isString());
         assertTrue("Wrong item 4 value", "txt".equals(val.getArray().get(3).getString()));
         assertTrue("Wrong item 5 value type",val.getArray().get(4).isObject());
-        assertTrue("Wrong item 5 field value type",val.getArray().get(4).getObject().getFieldValue("b").isString());
-        assertTrue("Wrong item 5 value", "txt".equals(val.getArray().get(4).getObject().getFieldValue("b").getString()));
+        assertTrue("Wrong item 5 field value type",val.getArray().get(4).getObject().get("b").isString());
+        assertTrue("Wrong item 5 value", "txt".equals(val.getArray().get(4).getObject().get("b").getString()));
 
     }
 
@@ -124,7 +106,7 @@ public class JsonParseTest {
     public void integerArrayParseTest() {
         String json = "{\"array\":[1,2,3]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",3,val.getArray().size());
@@ -139,7 +121,7 @@ public class JsonParseTest {
     public void decimalArrayParseTest() {
         String json = "{\"array\":[1.1,2.00,3.23]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",3,val.getArray().size());
@@ -155,7 +137,7 @@ public class JsonParseTest {
     public void textArrayParseTest() {
         String json = "{\"array\":[\"\",\"One\",\"Two\tThree\n\"]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",3,val.getArray().size());
@@ -171,7 +153,7 @@ public class JsonParseTest {
     public void booleanArrayParseTest() {
         String json = "{\"array\":[true,false,true]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",3,val.getArray().size());
@@ -187,12 +169,12 @@ public class JsonParseTest {
     public void nullArrayParseTest() {
         String json = "{\"array\":[null,null,null]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",3,val.getArray().size());
         for (JsonVal item : val.getArray()) {
-            assertTrue("Wrong item value type",item.isNull());
+            assertNull("Item not null",item);
         }
     }
 
@@ -200,26 +182,25 @@ public class JsonParseTest {
     public void objectArrayParseTest() {
         String json = "{\"array\":[{\"a\":1},{\"b\":null},{\"c\":\"txt\"}]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",3,val.getArray().size());
         assertTrue("Wrong item 1 value type",val.getArray().get(0).isObject());
-        assertTrue("Wrong item 1 field value type",val.getArray().get(0).getObject().getFieldValue("a").isInteger());
-        assertTrue("Wrong item 1 value", Integer.valueOf(1).equals(val.getArray().get(0).getObject().getFieldValue("a").getInteger()));
+        assertTrue("Wrong item 1 field value type",val.getArray().get(0).getObject().get("a").isInteger());
+        assertTrue("Wrong item 1 value", Integer.valueOf(1).equals(val.getArray().get(0).getObject().get("a").getInteger()));
         assertTrue("Wrong item 2 value type",val.getArray().get(1).isObject());
-        assertTrue("Wrong item 2 field value type",val.getArray().get(1).getObject().getFieldValue("b").isNull());
-        assertTrue("Wrong item 2 value", val.getArray().get(1).getObject().getFieldValue("b").isNull());
+        assertNull("Wrong item 2 value", val.getArray().get(1).getObject().get("b"));
         assertTrue("Wrong item 3 value type",val.getArray().get(2).isObject());
-        assertTrue("Wrong item 3 field value type",val.getArray().get(2).getObject().getFieldValue("c").isString());
-        assertTrue("Wrong item 3 value", "txt".equals(val.getArray().get(2).getObject().getFieldValue("c").getString()));
+        assertTrue("Wrong item 3 field value type",val.getArray().get(2).getObject().get("c").isString());
+        assertTrue("Wrong item 3 value", "txt".equals(val.getArray().get(2).getObject().get("c").getString()));
     }
 
     @Test
     public void emptyArrayParseTest() {
         String json = "{\"array\":[]}";
         JsonObj node = TinyJsonTool.parseObject(json);
-        JsonVal val = node.getFieldValue("array");
+        JsonVal val = node.get("array");
         assertTrue("Not an array",val.isArray());
         assertNotNull("Array empty",val.getArray());
         assertEquals("Wrong array size",0,val.getArray().size());
@@ -256,34 +237,40 @@ public class JsonParseTest {
         for (String json : jsonList) {
             JsonObj node = TinyJsonTool.parseObject(json);
 
-            JsonVal val = node.getFieldValue("a");
-            assertTrue("Wrong field a type", val.isNull());
+            JsonVal val = node.get("a");
+            assertNull("Wrong field a value", val);
 
-            val = node.getFieldValue("b");
+            val = node.get("b");
             assertTrue("Wrong field b type", val.isInteger());
             assertTrue("Wrong field b value",Integer.valueOf(1).equals(val.getInteger()));
+            assertTrue("Wrong field b value (alt get)",Integer.valueOf(1).equals(node.getInteger("b")));
 
-            val = node.getFieldValue("c");
+            val = node.get("c");
             assertTrue("Wrong field c type", val.isDecimal());
             assertTrue("Wrong field c value",new BigDecimal("2.3").equals(val.getDecimal()));
+            assertTrue("Wrong field c value (alt get)",new BigDecimal("2.3").equals(node.getDecimal("c")));
 
-            val = node.getFieldValue("d");
+            val = node.get("d");
             assertTrue("Wrong field d type", val.isBool());
             assertTrue("Wrong field d value",Boolean.FALSE.equals(val.getBool()));
+            assertTrue("Wrong field d value (alt get)",Boolean.FALSE.equals(node.getBool("d")));
 
-            val = node.getFieldValue("e");
+            val = node.get("e");
             assertTrue("Wrong field e type", val.isString());
             assertTrue("Wrong field e value","txt".equals(val.getString()));
+            assertTrue("Wrong field e value (alt get)","txt".equals(node.getString("e")));
 
-            val = node.getFieldValue("f");
+            val = node.get("f");
             assertTrue("Wrong field f type", val.isArray());
             assertTrue("Wrong field f type", val.getArray().get(0).isInteger());
             assertTrue("Wrong field f value",Integer.valueOf(1).equals( val.getArray().get(0).getInteger() ));
+            assertTrue("Wrong field f value (alt get)",Integer.valueOf(1).equals( node.getArray("f").get(0).getInteger() ));
 
-            val = node.getFieldValue("g");
+            val = node.get("g");
             assertTrue("Wrong field g type", val.isObject());
-            assertTrue("Wrong field h type", val.getObject().getFieldValue("h").isInteger());
-            assertTrue("Wrong field h value",Integer.valueOf(1).equals( val.getObject().getFieldValue("h").getInteger() ));
+            assertTrue("Wrong field h type", val.getObject().get("h").isInteger());
+            assertTrue("Wrong field h value",Integer.valueOf(1).equals( val.getObject().get("h").getInteger() ));
+            assertTrue("Wrong field h value (alt get)",Integer.valueOf(1).equals( node.getObject("g").getInteger("h") ));
         }
     }
 

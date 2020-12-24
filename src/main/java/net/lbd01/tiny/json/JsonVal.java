@@ -11,7 +11,6 @@ public class JsonVal {
     private static final byte DECIMAL_VALUE = 4;
     private static final byte OBJECT = 5;
     private static final byte ARRAY = 6;
-    private static final byte NULL = 7;
 
     private final byte type;
     private Object value;
@@ -65,10 +64,6 @@ public class JsonVal {
         return new JsonVal(ARRAY,value);
     }
 
-    public static JsonVal nullValue() {
-        return new JsonVal(NULL,null);
-    }
-
     public String getString() {
         return isString()?(String)value:null;
     }
@@ -117,10 +112,6 @@ public class JsonVal {
         return type == ARRAY;
     }
 
-    public boolean isNull() {
-        return type == NULL;
-    }
-
     protected void toJson(StringBuilder sb) {
         if (type == STRING_VALUE) {
             sb.append("\"");
@@ -136,11 +127,10 @@ public class JsonVal {
             for (JsonVal field : ((List<JsonVal>)value) ) {
                 if (first) first = false;
                 else sb.append(",");
-                field.toJson(sb);
+                if (field!=null) field.toJson(sb);
+                else sb.append("null");
             }
             sb.append("]");
-        } else if (type == NULL) {
-            sb.append("null");
         }
 
     }

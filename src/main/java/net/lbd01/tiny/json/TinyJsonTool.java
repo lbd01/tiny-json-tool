@@ -71,7 +71,7 @@ public class TinyJsonTool {
                 String fieldName = parseString(ctx);
                 findCharacter(ctx,_colon);
                 JsonVal fieldValue = parseFieldValue(ctx);
-                if (fieldValue!=null) object.setFieldValue(fieldName,fieldValue);
+                object.set(fieldName,fieldValue);
                 if ( (noNewFieldExpected = findCharacterOrComma(ctx,_curly_bracket_right)) ) break;
             }
         }
@@ -248,7 +248,7 @@ public class TinyJsonTool {
     private static JsonVal parseNull(Ctx ctx) {
         if (ctx.txt.length-ctx.idx>3 && ctx.txt[ctx.idx]==_n && ctx.txt[ctx.idx+1]==_u && ctx.txt[ctx.idx+2]==_l && ctx.txt[ctx.idx+3]==_l) {
             ctx.idx+=4;
-            return JsonVal.nullValue();
+            return null;
         }
         throw new JsonParseException("Value not 'null' at: " + ctx.idx);
     }

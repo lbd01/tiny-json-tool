@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.lbd01</groupId>
   <artifactId>tiny-json-tool</artifactId>
-  <version>2</version>
+  <version>2.1</version>
   <packaging>jar</packaging>
   <name>tiny-json-tool</name>
 
@@ -17,7 +17,7 @@
     </dependencies>
 
 	<properties>
-		<java.version>9</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 
 	<distributionManagement>
